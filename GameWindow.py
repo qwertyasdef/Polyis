@@ -11,6 +11,7 @@ class GameWindow:
 
     def __init__(self):
         self.window = tkinter.Tk()
+        self.window.title('Polyis')
         self.window.configure(bg='light gray')
         
         frame = tkinter.Frame(
@@ -53,6 +54,24 @@ class GameWindow:
             anchor='w',
         )
         score.pack(fill='x', pady=50)
+
+        instructions = tkinter.Label(
+            left,
+            text=(
+                'Move: \u2190 \u2192\n'
+                'Rotate: \u2191  /  Z X\n'
+                'Hold: shift  /  C\n'
+                'Soft drop: \u2193\n'
+                'Hard drop: space\n'
+                'Restart: R'
+            ),
+            font=('Helvetica', 12),
+            fg='black',
+            bg='light gray',
+            anchor='w',
+            justify='left',
+        )
+        instructions.pack(fill='x', side='bottom')
 
         center = tkinter.Frame(
             frame,
