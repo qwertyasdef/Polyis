@@ -143,9 +143,9 @@ class GameManager:
 
     def place(self):
         self.placed += self.current.squares()
-        self.current = None
         self.clear_lines()
         self.check_game_over()
+        self.current = None
         self.update_pieces()
         self.speed += 0.01
 
@@ -179,6 +179,8 @@ class GameManager:
         y = 20
         while y > 0:
             y -= 1
+            if y not in map(lambda square: square.y, self.current.squares()):
+                continue
             clear = True
             for x in range(10):
                 if GamePiece.Square(x, y, '') not in self.placed:
