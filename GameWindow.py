@@ -133,6 +133,8 @@ class GameWindow:
         self.held.delete('all')
         self.next.delete('all')
         self.upcoming.delete('all')
+
+        self.draw_grid()
         
         for square in gm.placed:
             self.draw_square(self.board, square, self.SQUARE_SIZE)
@@ -172,6 +174,12 @@ class GameWindow:
         
         self.window.after(1000 // self.FPS, self.draw, gm)
 
+    def draw_grid(self):
+        for i in range(0, self.BOARD_WIDTH, self.SQUARE_SIZE):
+            self.board.create_line(i, 0, i, self.BOARD_HEIGHT, fill='#222')
+        for i in range(0, self.BOARD_HEIGHT, self.SQUARE_SIZE):
+            self.board.create_line(0, i, self.BOARD_WIDTH, i, fill='#222')
+    
     def draw_square(self, canvas, square, size):
         canvas.create_rectangle(
             square.x * size, square.y * size,
