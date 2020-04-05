@@ -32,14 +32,15 @@ class GamePiece:
 
     def clockwise(self):
         self.polyomino.clockwise()
-        self.recenter()
+        new_center = (self.polyomino.width - 1 - self.center[1], self.center[0])
+        self.recenter(new_center)
 
     def counterclockwise(self):
         self.polyomino.counterclockwise()
-        self.recenter()
+        new_center = (self.center[1], self.polyomino.height - 1 - self.center[0])
+        self.recenter(new_center)
 
-    def recenter(self):
-        new_center = self.get_center()
+    def recenter(self, new_center):
         self.x += self.center[0] - new_center[0]
         self.y += self.center[1] - new_center[1]
         self.center = new_center
@@ -68,11 +69,11 @@ class GamePiece:
         index = 1
         for c in str(self.polyomino):
             if c == ' ':
-                index *= 11
+                index *= 2
             elif c == '#':
-                index *= 13
+                index *= 3
             else:
-                index *= 17
+                index *= 5
             index += 1
         return self.COLORS[index % len(self.COLORS)]
         

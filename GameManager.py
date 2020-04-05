@@ -16,14 +16,14 @@ class GameManager:
         self.held = None
         self.upcoming = [] # 0 is next, 1-3 are preview
         self.placed = [] # list of squares, not polyominos
-        
+
         while len(self.upcoming) < 4:
             self.update_pieces()
 
     def update_pieces(self):
         if self.game_over:
             return
-        
+
         if len(self.upcoming) < 5:
             self.upcoming += self.get_pieces()
         self.current = self.current or self.upcoming.pop(0)
@@ -32,23 +32,76 @@ class GameManager:
     def clockwise(self):
         if self.game_over:
             return
-        
+
         self.current.clockwise()
-        if self.collide():
+        if not self.rotation_kick():
             self.current.counterclockwise()
 
     def counterclockwise(self):
         if self.game_over:
             return
-        
+
         self.current.counterclockwise()
-        if self.collide():
+        if not self.rotation_kick():
             self.current.clockwise()
+
+    def rotation_kick(self):
+        original_x = self.current.x
+        original_y = self.current.y
+
+        # BFS to see if the piece fits somewhere below
+        queue = [(0, 0)]
+        visited = []
+        while len(queue) > 0:
+            pos = queue.pop(0)
+            if pos in visited:
+                continue
+            visited.append(pos)
+
+            self.current.x = original_x + pos[0]
+            self.current.y = original_y + pos[1]
+            if not self.collide():
+                return True
+
+            if abs(pos[1] + 1) <= self.current.polyomino.height / 2:
+                queue.append((pos[0], pos[1] + 1))
+            if abs(pos[0] - 1) <= self.current.polyomino.width / 2:
+                queue.append((pos[0] - 1, pos[1]))
+            if abs(pos[0] + 1) <= self.current.polyomino.width / 2:
+                queue.append((pos[0] + 1, pos[1]))
+        self.current.x = original_x
+        self.current.y = original_y
+
+        # BFS to see if the piece fits somewhere above
+        queue = [(0, -1)]
+        visited = []
+        while len(queue) > 0:
+            pos = queue.pop(0)
+            if pos in visited:
+                continue
+            visited.append(pos)
+
+            self.current.x = original_x + pos[0]
+            self.current.y = original_y + pos[1]
+            if not self.collide():
+                return True
+
+            if abs(pos[1] - 1) <= self.current.polyomino.height / 2:
+                queue.append((pos[0], pos[1] - 1))
+            if abs(pos[0] - 1) <= self.current.polyomino.width / 2:
+                queue.append((pos[0] - 1, pos[1]))
+            if abs(pos[0] + 1) <= self.current.polyomino.width / 2:
+                queue.append((pos[0] + 1, pos[1]))
+        self.current.x = original_x
+        self.current.y = original_y
+
+        # Couldn't perform any kicks to make the piece not collide
+        return False
 
     def left(self):
         if self.game_over:
             return
-        
+
         self.current.left()
         if self.collide():
             self.current.right()
@@ -56,7 +109,7 @@ class GameManager:
     def right(self):
         if self.game_over:
             return
-        
+
         self.current.right()
         if self.collide():
             self.current.left()
@@ -64,13 +117,13 @@ class GameManager:
     def down_pressed(self):
         if self.game_over:
             return
-        
+
         self.is_down = True
 
     def down_released(self):
         if self.game_over:
             return
-        
+
         self.is_down = False
 
     def down(self):
@@ -82,7 +135,7 @@ class GameManager:
     def drop(self):
         if self.game_over:
             return
-        
+
         while not self.collide():
             self.current.down()
         self.current.up()
@@ -95,11 +148,11 @@ class GameManager:
         self.check_game_over()
         self.update_pieces()
         self.speed += 0.01
-    
+
     def hold(self):
         if self.game_over:
             return
-        
+
         time = 0
         if self.held is None:
             self.held = self.current
@@ -143,7 +196,7 @@ class GameManager:
                 else:
                     points *= lines
         self.score += points
-        
+
 
     def check_game_over(self):
         for square in self.placed:
@@ -164,16 +217,13 @@ class GameManager:
     def update(self):
         if self.game_over:
             return
-        
+
         self.time += 1
-        
+
         real_speed = self.speed
         if self.is_down:
             real_speed = max(8, self.speed)
-        
+
         if self.time >= self.FPS // real_speed:
             self.down()
             self.time = 0
-
-
-

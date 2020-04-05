@@ -1,4 +1,5 @@
 import tkinter
+from PIL import Image, ImageTk
 
 class GameWindow:
     
@@ -10,12 +11,13 @@ class GameWindow:
 
     def __init__(self):
         self.window = tkinter.Tk()
+        self.window.configure(bg='light gray')
         
         frame = tkinter.Frame(
             self.window,
             bg='light gray',
         )
-        frame.pack()
+        frame.pack(anchor='center')
 
         left = tkinter.Frame(
             frame,
@@ -38,6 +40,7 @@ class GameWindow:
             width=self.BOX_SIZE,
             height=self.BOX_SIZE,
             bg='black',
+            highlightthickness=0,
         )
         held.pack()
 
@@ -54,8 +57,6 @@ class GameWindow:
         center = tkinter.Frame(
             frame,
             bg='light gray',
-            highlightbackground='black',
-            highlightthickness=1,
         )
         center.pack(side='left', pady=50)
         
@@ -64,8 +65,16 @@ class GameWindow:
             width=self.BOARD_WIDTH,
             height=self.BOARD_HEIGHT,
             bg='black',
+            highlightthickness=0,
         )
         board.pack()
+
+        overlay = Image.new(
+            'RGBA',
+            (self.BOARD_WIDTH, self.BOARD_HEIGHT),
+            (128, 128, 128, 192),
+        )
+        self.overlay = ImageTk.PhotoImage(overlay)
 
         right = tkinter.Frame(
             frame,
@@ -88,6 +97,7 @@ class GameWindow:
             width=self.BOX_SIZE,
             height=self.BOX_SIZE,
             bg='black',
+            highlightthickness=0,
         )
         next.pack()
         
@@ -96,6 +106,7 @@ class GameWindow:
             width=self.BOX_SIZE,
             height=3*self.BOX_SIZE,
             bg='black',
+            highlightthickness=0,
         )
         preview.pack(pady=25)
 
@@ -138,6 +149,26 @@ class GameWindow:
         self.preview(self.next, 0, gm.upcoming[0])
         for i in range(1, 4):
             self.preview(self.upcoming, i - 1, gm.upcoming[i])
+
+        if gm.game_over:
+            self.board.create_image(0, 0, image=self.overlay, anchor='nw')
+            
+            self.board.create_text(
+                self.BOARD_WIDTH / 2,
+                self.BOARD_HEIGHT / 2 - 24,
+                anchor='center',
+                font=('Helvetica', 32),
+                fill='white',
+                text='Game Over',
+            )
+            self.board.create_text(
+                self.BOARD_WIDTH / 2,
+                self.BOARD_HEIGHT / 2 + 24,
+                anchor='center',
+                font=('Helvetica', 16),
+                fill='white',
+                text='Press <R> to restart',
+            )
         
         self.window.after(1000 // self.FPS, self.draw, gm)
 
