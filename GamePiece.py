@@ -66,15 +66,16 @@ class GamePiece:
         ))
 
     def get_color(self):
+        # These numbers experimentally produce a good distribution
         index = 1
         for c in str(self.polyomino):
+            index *= 3
             if c == ' ':
-                index *= 2
+                index += 5
             elif c == '#':
-                index *= 3
+                index += 3
             else:
-                index *= 5
-            index += 1
+                index += 6
         return self.COLORS[index % len(self.COLORS)]
         
 class Square:
@@ -86,3 +87,15 @@ class Square:
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
 
+def hash_test(n):
+    a = []
+    for i in range(1, n + 1):
+        a += Polyomino.generate(i)
+    a = map(lambda p: GamePiece(p).color, a)
+    dist = {}
+    for c in a:
+        if c in dist:
+            dist[c] += 1
+        else:
+            dist[c] = 1
+    print(dist)
