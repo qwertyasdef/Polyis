@@ -10,7 +10,7 @@ class GameManager:
         self.FPS = FPS
         self.is_down = False
         self.game_over = False
-        self.level = 1
+        self.level = 0
         self.score = 0
         self.current = None
         self.held = None
@@ -209,11 +209,11 @@ class GameManager:
         self.__init__(self.FPS)
 
     def get_pieces(self):
+        self.level += 1
         polyominos = []
         for i in range(1, self.level + 1):
             polyominos += Polyomino.generate(i)
         random.shuffle(polyominos)
-        self.level += 1
         return map(lambda polyomino: GamePiece.GamePiece(polyomino), polyominos)
 
     def update(self):

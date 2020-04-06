@@ -78,6 +78,17 @@ class GameWindow:
             bg='light gray',
         )
         center.pack(side='left', pady=50)
+
+        level = tkinter.Label(
+            center,
+            text='Level 1',
+            font=('Helvetica', 20),
+            fg='black',
+            bg='light gray',
+            anchor='w',
+            justify='left',
+        )
+        level.pack(fill='x')
         
         board = tkinter.Canvas(
             center,
@@ -131,6 +142,7 @@ class GameWindow:
 
         self.held = held
         self.score = score
+        self.level = level
         self.board = board
         self.next = next
         self.upcoming = preview
@@ -153,6 +165,13 @@ class GameWindow:
         self.next.delete('all')
         self.upcoming.delete('all')
 
+        if gm.held is not None:
+            self.preview(self.held, 0, gm.held)
+
+        self.score['text'] = 'Score: ' + str(gm.score)
+
+        self.level['text'] = 'Level ' + str(gm.level)
+
         self.draw_grid()
         
         for square in gm.placed:
@@ -161,11 +180,6 @@ class GameWindow:
         if gm.current is not None:
             for square in gm.current.squares():
                 self.draw_square(self.board, square, self.SQUARE_SIZE)
-
-        if gm.held is not None:
-            self.preview(self.held, 0, gm.held)
-
-        self.score['text'] = 'Score: ' + str(gm.score)
 
         self.preview(self.next, 0, gm.upcoming[0])
         for i in range(1, 4):
